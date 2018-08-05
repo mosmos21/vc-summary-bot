@@ -1,4 +1,3 @@
-.idea/
 node_modules/
 
-local_run.sh
+local_run.*

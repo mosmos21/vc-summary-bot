@@ -1,113 +1,69 @@
-var app = require('../app');
-var Twit = require('twit');
-var request = require('request');
-var cheerio = require('cheerio');
-var cron = require('cron');
-var moment = require('moment');
+import cheerio from 'cheerio';
+import cron from 'cron';
+import moment from 'moment';
+import request from 'request-promise';
+import Twit from 'twit';
 
-const url = 'https://not-522.appspot.com/';
+import app from '../app';
 
-var cronTimes = {
-  init: '0 0 0 * * * ',
-  getContestList: '0 0 0 * * * ',
-  countAccept: '0 0 0 * * * ',
-  summary: '0 0 0 * * * ',
-};
+const url = 'https://not-522.appspot.com';
 
-var contestList = [];
-var accepts = [];
-
-var T = new Twit({
+const T = new Twit({
   consumer_key: app.get('options').key,
   consumer_secret: app.get('options').secret,
   access_token: app.get('options').token,
   access_token_secret: app.get('options').token_secret
 });
 
-var tweet = function (message) {
+const tweet = function (message) {
   console.log('tweet message:', message);
   T.post('statuses/update', { status: message }, (err, data, response) => {
-    if(err) {
+    if (err) {
       console.log(err);
-    } else {
-      console.log('response status:', response.statusCode);
-      console.log('tweet id:', data.id);
     }
+    console.log('response status:', response.statusCode);
+    console.log('tweet id:', data.id);
   });
 };
 
-var beforeDay = function () {
-  return moment().utc().add(9, 'h').subtract(1, 'd').format('YYYY-MM-DD');
-}
+const beforeDay = () => moment().utc().add(9, 'h').subtract(1, 'd').format('YYYY-MM-DD');
 
-var init = new cron.CronJob({
-  cronTime: cronTimes.init,
-  onTick: function () {
-    contestList = [];
-    accepts = [];
-  },
-  start: false,
-  timeZone: 'Asia/Tokyo',
-});
-
-var getContestList = new cron.CronJob({
-  cronTime: cronTimes.getContestList,
-  onTick: function () {
-    request(url, function (err, res, body) {
-      if(err) {
-        console.err(err);
-      }
-      var $ = cheerio.load(body);
-      var before = beforeDay();
-      $('.table > tbody > tr').each(function() {
-        var time = $(this).find('td:nth-child(2)').text().trim();
-        if(time.startsWith(before)) {
-          contestList.push({
-            title: $(this).find('td:nth-child(1)').text().trim(),
-            url: $(this).find('td:nth-child(1) > a').attr('href').trim(),
-            startTime: $(this).find('td:nth-child(2)').text().trim(),
-            endTime: $(this).find('td:nth-child(3)').text().trim(),
-          });
-        }
+const run = () => {
+  const options = {
+    uri: url,
+    transform: body => cheerio.load(body)
+  };
+  request(options).then($ => {
+    const before = beforeDay();
+    let contests = [];
+    $('.table > tbody > tr').each((idx, ele) => {
+      contests.push({
+        url: $(ele).find('td:nth-child(1) > a').attr('href').trim(),
+        startTime: $(ele).find('td:nth-child(2)').text().trim(),
       });
     });
-  },
-  start: false,
-  timeZone: 'Asia/Tokyo',
-});
-
-var countAccept = new cron.CronJob({
-  cronTime: cronTimes.countAccept,
-  onTick: function () {
-    contestList.forEach(function(contest) {
-      request(url + contest.url, function(err, res, body) {
-        if(err) {
-          console.err(err);
-        }
-        var $ = cheerio.load(body);
-        $('table > tbody > tr').each(function() {
-          var userId = $(this).find('th:nth-child(2)').text().trim();
-          var count = $(this).find('td').filter(function() {
-            return 1 < $(this).text().trim().length;
-          }).length;
+    return contests.filter(c => c.startTime.startsWith(before));
+  }).then(arr => {
+    const ranks = (contest) => () => {
+      const options = {
+        uri: url + contest,
+        transform: body => cheerio.load(body),
+      };
+      let accepts = [];
+      request(options).then($ => {
+        $('.table > tbody > tr').each((idx, ele) => {
           accepts.push({
-            url: contest.url,
-            userId: userId,
-            count: count - 1,
+            userId: $(ele).find('th:nth-child(2)').text().trim(),
+            count: $(ele).find('td').filter((idx2, cld) => 1 < $(cld).text().trim().length).length - 1,
           });
         });
-        accepts.forEach(function(data) {
-          console.log(data);
-        });
+        return accepts;
       });
-    });
-  },
-  start: false,
-  timeZone: 'Asia/Tokyo',
-});
-
-//==============================
-tweet('botが起動しました。\n' + new Date());
-init.start();
-getContestList.start();
-countAccept.start();
+    };
+    return Promise.all(arr.map(a => a.url).map(url => ranks(url)));
+  }).then(contestRanks => {
+    console.log(contestRanks);
+  })
+    .catch(err => console.error(err));
+}
+run();

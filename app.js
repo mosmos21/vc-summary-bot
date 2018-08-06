@@ -1,7 +1,7 @@
-var express = require('express');
-var app = express();
+import express from 'express';
+const app = express();
 
-var options = {
+const options = {
   key: process.env.TWIBOT_TWITTER_KEY,
   secret: process.env.TWIBOT_TWITTER_SECRET,
   token: process.env.TWIBOT_TWITTER_TOKEN,
@@ -12,11 +12,11 @@ app.set('options', options);
 app.set('port', (process.env.PORT || 5000));
 app.use(express.static(__dirname + '/public'));
 
-app.get('/', function(request, response) {
+app.get('/', (request, response) => {
   response.send('This is Twitter-bot application.\n' + new Date());
 });
 
-app.listen(app.get('port'), function() {
+app.listen(app.get('port'), () => {
   console.log("Node app is running at localhost:" + app.get('port'))
 });
 module.exports = app;

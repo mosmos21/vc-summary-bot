@@ -1,3 +1,4 @@
+'use strict';
 import cheerio from 'cheerio';
 import cron from 'cron';
 import moment from 'moment';
@@ -28,13 +29,18 @@ const tweet = function (message) {
 
 const beforeDay = () => moment().utc().add(9, 'h').subtract(1, 'd').format('YYYY-MM-DD');
 
+const buildSummary = (date, summary) => {
+
+};
+
 const run = () => {
+  const before = beforeDay();
   const options = {
     uri: url,
     transform: body => cheerio.load(body)
   };
   request(options).then($ => {
-    const before = beforeDay();
+    console.log('date:', before);
     let contests = [];
     $('.table > tbody > tr').each((idx, ele) => {
       contests.push({
@@ -43,27 +49,23 @@ const run = () => {
       });
     });
     return contests.filter(c => c.startTime.startsWith(before));
-  }).then(arr => {
-    const ranks = (contest) => () => {
-      const options = {
-        uri: url + contest,
-        transform: body => cheerio.load(body),
-      };
-      let accepts = [];
-      request(options).then($ => {
-        $('.table > tbody > tr').each((idx, ele) => {
-          accepts.push({
-            userId: $(ele).find('th:nth-child(2)').text().trim(),
-            count: $(ele).find('td').filter((idx2, cld) => 1 < $(cld).text().trim().length).length - 1,
-          });
-        });
-        return accepts;
+  }).then(arr => Promise.all(arr.map(a => request({
+    uri: url + a.url,
+    transform: body => cheerio.load(body)
+  })))).then(results => {
+    let summary = {};
+    results.forEach($ => {
+      $('.table > tbody > tr').each((idx, ele) => {
+        const userId = $(ele).find('th:nth-child(2)').text().trim();
+        const count = $(ele).find('td').filter((idx2, cld) => 1 < $(cld).text().trim().length).length - 1;
+        if (summary[userId]) {
+          summary[userId] = count;
+        } else {
+          summary[userId] = count;
+        }
       });
-    };
-    return Promise.all(arr.map(a => a.url).map(url => ranks(url)));
-  }).then(contestRanks => {
-    console.log(contestRanks);
-  })
-    .catch(err => console.error(err));
+    });
+    tweet(buildSummary(before, summary));
+  }).catch(err => console.error(err));
 }
 run();

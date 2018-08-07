@@ -17,7 +17,7 @@ const T = new Twit({
 });
 
 const tweet = function (message) {
-  console.log('tweet message:', message);
+  console.log('tweet message:\n', message);
   T.post('statuses/update', { status: message }, (err, data, response) => {
     if (err) {
       console.log(err);
@@ -29,8 +29,20 @@ const tweet = function (message) {
 
 const beforeDay = () => moment().utc().add(9, 'h').subtract(1, 'd').format('YYYY-MM-DD');
 
-const buildSummary = (date, summary) => {
-
+const buildSummary = (summary) => {
+  const date = moment().utc().add(9, 'h').subtract(1, 'd').format('M月D日');
+  const max = Math.max.apply(null, Object.values(summary));
+  const top = Object.keys(summary).filter(id => summary[id] === max).sort();
+  if (top.length === 0) {
+    return '今日はバチャコンでACした人がいませんでした';
+  }
+  return date + 'のバチャコンのAC数の記録\n' +
+    '一番バチャコンでACが多かった人は' + top.length + '人いました！\n' +
+    '\n' +
+    top.join(' さん\n') + ' さん\n' +
+    '\n' +
+    'AC数はなんと' + max + 'ACでした！\n' +
+    '明日も頑張りましょう！';
 };
 
 const run = () => {
@@ -40,7 +52,6 @@ const run = () => {
     transform: body => cheerio.load(body)
   };
   request(options).then($ => {
-    console.log('date:', before);
     let contests = [];
     $('.table > tbody > tr').each((idx, ele) => {
       contests.push({
@@ -65,7 +76,13 @@ const run = () => {
         }
       });
     });
-    tweet(buildSummary(before, summary));
+    tweet(buildSummary(summary));
   }).catch(err => console.error(err));
 }
-run();
+
+new cron.CronJob({
+  cronTime: '0 30 0 * * *',
+  onTick: () => run(),
+  start: true,
+  timeZone: 'Asia/Tokyo',
+});

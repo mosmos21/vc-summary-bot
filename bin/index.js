@@ -78,7 +78,7 @@ const run = () => {
     tweet(buildSummary(summary));
   }).catch(err => console.error(err));
 }
-run();
+
 new cron.CronJob({
   cronTime: '0 30 0 * * *',
   onTick: () => run(),

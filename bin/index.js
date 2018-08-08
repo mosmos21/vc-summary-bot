@@ -7,7 +7,7 @@ import Twit from 'twit';
 
 import app from '../app';
 
-const url = 'https://not-522.appspot.com';
+const HOST = 'https://not-522.appspot.com';
 
 const T = new Twit({
   consumer_key: app.get('options').key,
@@ -51,7 +51,7 @@ const buildSummary = (summary) => {
 const run = () => {
   const before = beforeDay();
   const options = {
-    uri: url,
+    uri: HOST,
     transform: body => cheerio.load(body)
   };
   request(options).then($ => {
@@ -64,7 +64,7 @@ const run = () => {
     });
     return contests.filter(c => c.startTime.startsWith(before));
   }).then(arr => Promise.all(arr.map(a => request({
-    uri: url + a.url,
+    uri: HOST + a.url,
     transform: body => cheerio.load(body)
   })))).then(results => {
     let summary = {};
@@ -72,17 +72,13 @@ const run = () => {
       $('.table > tbody > tr').each((idx, ele) => {
         const userId = $(ele).find('th:nth-child(2)').text().trim();
         const count = $(ele).find('td').filter((idx2, cld) => 1 < $(cld).text().trim().length).length - 1;
-        if (summary[userId]) {
-          summary[userId] = count;
-        } else {
-          summary[userId] = count;
-        }
+        summary[userId] = (summary[userId] ? summary[userId] : 0) + count;
       });
     });
     tweet(buildSummary(summary));
   }).catch(err => console.error(err));
 }
-
+run();
 new cron.CronJob({
   cronTime: '0 30 0 * * *',
   onTick: () => run(),

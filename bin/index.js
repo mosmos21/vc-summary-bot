@@ -29,20 +29,23 @@ const tweet = function (message) {
 
 const beforeDay = () => moment().utc().add(9, 'h').subtract(1, 'd').format('YYYY-MM-DD');
 
+const message = (date, top, max) =>
+  `${date}のばちゃこんのAC数の記録
+一番ばちゃこんでACが多かった人は${top.length}人いました！
+
+${top.join(" さん\n")} さん
+
+AC数はなんと${max}ACでした！
+明日も頑張りましょう！`;
+
 const buildSummary = (summary) => {
   const date = moment().utc().add(9, 'h').subtract(1, 'd').format('M月D日');
   const max = Math.max.apply(null, Object.values(summary));
   const top = Object.keys(summary).filter(id => summary[id] === max).sort();
   if (top.length === 0) {
-    return '今日はバチャコンでACした人がいませんでした';
+    return '今日は、ばちゃこんでACした人がいませんでした';
   }
-  return date + 'のバチャコンのAC数の記録\n' +
-    '一番バチャコンでACが多かった人は' + top.length + '人いました！\n' +
-    '\n' +
-    top.join(' さん\n') + ' さん\n' +
-    '\n' +
-    'AC数はなんと' + max + 'ACでした！\n' +
-    '明日も頑張りましょう！';
+  return message(date, top, max);
 };
 
 const run = () => {

@@ -1,4 +1,6 @@
 import express from 'express';
+import * as consts from './bin/consts';
+
 const app = express();
 
 const options = {
@@ -13,7 +15,7 @@ app.set('port', (process.env.PORT || 5000));
 app.use(express.static(__dirname + '/public'));
 
 app.get('/', (request, response) => {
-  response.send('This is Twitter-bot application.<br />' + new Date());
+  response.send(`This is Twitter-bot application. version: ${consts.VERSION}`);
 });
 
 app.listen(app.get('port'), () => {

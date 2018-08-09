@@ -13,7 +13,7 @@ app.set('port', (process.env.PORT || 5000));
 app.use(express.static(__dirname + '/public'));
 
 app.get('/', (request, response) => {
-  response.send('This is Twitter-bot application.\n' + new Date());
+  response.send('This is Twitter-bot application.<br />' + new Date());
 });
 
 app.listen(app.get('port'), () => {

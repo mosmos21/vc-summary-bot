@@ -16,7 +16,7 @@ AC数はなんと${max}ACでした！
 
 export default class Daily {
 
-  static buildSummary(summary) {
+  static buildTweetMessage(summary) {
     const date = moment().utc().add(9, 'h').subtract(1, 'd').format('M月D日');
     const max = Math.max.apply(null, Object.values(summary));
     const top = Object.keys(summary).filter(id => summary[id] === max).sort();
@@ -49,11 +49,11 @@ export default class Daily {
       results.forEach($ => {
         $('.table > tbody > tr').each((idx, ele) => {
           const userId = $(ele).find('th:nth-child(2)').text().trim();
-          const count = $(ele).find('td').filter((idx2, cld) => 1 < $(cld).text().trim().length).length - 1;
+          const count = $(ele).find('td').filter((idx2, res) => 1 < $(res).text().trim().length).length - 1;
           summary[userId] = (summary[userId] ? summary[userId] : 0) + count;
         });
       });
-      Twitter.tweet(this.buildSummary(summary));
+      Twitter.tweet(this.buildTweetMessage(summary));
     }).catch(err => console.error(err));
   }
 }

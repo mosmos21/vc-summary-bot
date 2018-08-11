@@ -7,7 +7,7 @@ import Twitter from '../twitter';
 
 const message = (date, top, max) =>
   `${date}のばちゃこんのAC数の記録
-一番ばちゃこんでACが多かった人は${top.length}人いました！
+一番ばちゃこんでACが多かった人は${top.length}人でした！
 
 ${top.join(" さん\n")} さん
 

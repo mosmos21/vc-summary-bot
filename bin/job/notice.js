@@ -10,7 +10,7 @@ const message = con =>
 コンテスト名：${con.title}
 開始時間：${con.startTime}
 終了時間：${con.endTime}
-${con.penalty}
+ペナルティ：${con.penalty}
 
 ${consts.HOST}${con.url}`;
 
@@ -45,7 +45,10 @@ export default class Notice {
         };
         request(options).then($ => {
           const header = $('h1 > small').text().trim();
-          c.penalty = header.substring(header.indexOf('ペナルティ'));
+          c.penalty = header.substring(header.indexOf('ペナルティ') + 5).split('/')[0];
+          if(c.penalty === undefined || c.penalty === '') {
+            c.penalty = '0分';
+          }
           Twitter.tweet(message(c));
         })
       });

@@ -35,7 +35,7 @@ export default class Notice {
         });
       });
       return contests.filter(c =>
-        moment(c.startTime).isAfter(start) && moment(c.endTime).isBefore(end)
+        moment(c.startTime).isAfter(start) && moment(c.startTime).isBefore(end)
       );
     }).then(contests => {
       contests.reverse().forEach(c => {

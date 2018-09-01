@@ -11,13 +11,16 @@ const T = new Twit({
 
 export default class Twitter {
   static tweet(message) {
-    console.log('tweet message:\n', message);
-    T.post('statuses/update', { status: message }, (err, data, response) => {
-      if (err) {
-        console.log(err);
-      }
-      console.log('response status:', response.statusCode);
-      console.log('tweet id:', data.id);
-    });
+    if(app.get('options').local_run) {
+      console.log('tweet message:\n', message);
+    } else {
+      T.post('statuses/update', {status: message}, (err, data, response) => {
+        if (err) {
+          console.log(err);
+        }
+        console.log('response status:', response.statusCode);
+        console.log('tweet id:', data.id);
+      });
+    }
   };
 }

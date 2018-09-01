@@ -2,3 +2,5 @@
 node_modules/
 
 local_run.*
+
+package-lock.json

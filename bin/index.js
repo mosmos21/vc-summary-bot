@@ -12,7 +12,7 @@ new cron.CronJob({
 });
 
 new cron.CronJob({
-  cronTime: '0 0 0-23/4 * * *',
+  cronTime: '0 0 */4 * * *',
   onTick: () => Notice.run(),
   start: true,
   timeZone: 'Asia/Tokyo',

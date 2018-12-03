@@ -7,7 +7,8 @@ const options = {
   key: process.env.TWIBOT_TWITTER_KEY,
   secret: process.env.TWIBOT_TWITTER_SECRET,
   token: process.env.TWIBOT_TWITTER_TOKEN,
-  token_secret: process.env.TWIBOT_TWITTER_TOKEN_SECRET
+  token_secret: process.env.TWIBOT_TWITTER_TOKEN_SECRET,
+  local_run: process.env.LOCAL_RUN
 };
 app.set('options', options);
 

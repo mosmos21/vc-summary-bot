@@ -1,5 +1,5 @@
 'use strict';
-import app from '../app';
+import app from '../../app';
 import Twit from 'twit';
 
 const T = new Twit({

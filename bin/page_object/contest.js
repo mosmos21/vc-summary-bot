@@ -6,7 +6,7 @@ export default class Contest {
   }
 
   penalty() {
-    const header = $('h1 > small').text().trim();
+    const header = this.body('h1 > small').text().trim();
     const penalty = header.substring(header.indexOf('ペナルティ') + 5).split('/')[0];
     return penalty !== undefined || penalty !== ''
       ? Number(penalty.replace(/分/, ''))

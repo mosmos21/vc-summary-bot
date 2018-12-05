@@ -3,7 +3,7 @@ import * as consts from '../consts';
 import cheerio from 'cheerio';
 import moment from 'moment';
 import request from 'request-promise';
-import Twitter from '../twitter';
+import Twitter from '../util/twitter';
 
 const message = con =>
   `ばちゃこん情報
@@ -46,7 +46,7 @@ export default class Notice {
         request(options).then($ => {
           const header = $('h1 > small').text().trim();
           c.penalty = header.substring(header.indexOf('ペナルティ') + 5).split('/')[0];
-          if(c.penalty === undefined || c.penalty === '') {
+          if (c.penalty === undefined || c.penalty === '') {
             c.penalty = '0分';
           }
           Twitter.tweet(message(c));

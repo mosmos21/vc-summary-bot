@@ -1,9 +1,12 @@
-'use strict';
-import * as consts from '../consts';
-import cheerio from 'cheerio';
-import moment from 'moment';
-import request from 'request-promise';
-import Twitter from '../twitter';
+'use strict'
+
+import moment from 'moment'
+
+import * as consts from '../consts'
+import Twitter from '../util/twitter'
+import Req from '../util/request-wrapper'
+import Top from '../page_object/top'
+import Contest from '../page_object/contest'
 
 const message = con =>
   `ばちゃこん情報
@@ -12,46 +15,24 @@ const message = con =>
 終了時間：${con.endTime}
 ペナルティ：${con.penalty}
 
-${consts.HOST}${con.url}`;
+${consts.HOST}${con.url}`
 
 export default class Notice {
-
-  static run() {
+  async run() {
     moment.locale('ja');
-    const start = moment().add(4, 'h').format('YYYY-MM-DD HH:mm:ss');
-    const end = moment().add(8, 'h').format('YYYY-MM-DD HH:mm:ss');
-    const options = {
-      uri: consts.HOST,
-      transform: body => cheerio.load(body)
-    };
-    request(options).then($ => {
-      let contests = [];
-      $('.table > tbody > tr').each((idx, ele) => {
-        contests.push({
-          url: $(ele).find('td:nth-child(1) > a').attr('href').trim(),
-          title: $(ele).find('td:nth-child(1)').text().trim(),
-          startTime: $(ele).find('td:nth-child(2)').text().trim(),
-          endTime: $(ele).find('td:nth-child(3)').text().trim(),
-        });
-      });
-      return contests.filter(c =>
-        moment(c.startTime).isAfter(start) && moment(c.startTime).isBefore(end)
-      );
-    }).then(contests => {
-      contests.reverse().forEach(c => {
-        const options = {
-          uri: consts.HOST + c.url,
-          transform: body => cheerio.load(body)
-        };
-        request(options).then($ => {
-          const header = $('h1 > small').text().trim();
-          c.penalty = header.substring(header.indexOf('ペナルティ') + 5).split('/')[0];
-          if(c.penalty === undefined || c.penalty === '') {
-            c.penalty = '0分';
-          }
-          Twitter.tweet(message(c));
-        })
-      });
-    }).catch(err => console.error(err));
+    const start = moment().add(4, 'h').format('YYYY-MM-DD HH:mm:ss')
+    const end = moment().add(8, 'h').format('YYYY-MM-DD HH:mm:ss')
+
+    const contestList
+      = new Top(await Req.get(consts.PATH.top))
+        .getContestUrlList()
+        .filter(c =>
+          moment(c.startTime).isAfter(start)
+          && moment(c.startTime).isBefore(end))
+
+    contestList.forEach(async (contest) => {
+      contest.penalty = new Contest(await Req.get(contest.url)).penalty()
+      Twitter.tweet(message(contest))
+    })
   }
 }

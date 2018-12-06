@@ -1,19 +1,17 @@
 'use strict';
 
-import cron from 'cron';
-import Daily from './job/daily';
-import Notice from './job/notice';
+import Daily from './job/daily'
+import Notice from './job/notice'
+import CronJob from './util/cron_job'
+const jobs = new CronJob();
 
-new cron.CronJob({
-  cronTime: '0 15 0 * * *',
-  onTick: () => Daily.run(),
-  start: true,
-  timeZone: 'Asia/Tokyo',
-});
-
-new cron.CronJob({
-  cronTime: '0 0 */4 * * *',
-  onTick: () => Notice.run(),
-  start: true,
-  timeZone: 'Asia/Tokyo',
-});
+jobs.addAll([
+  {
+    cronTime: '0 15 0 * * *',
+    jobClass: new Daily(),
+  }, {
+    cronTime: '0 0 */4 * * *',
+    jobClass: new Notice(),
+  }
+]);
+jobs.applyAll();

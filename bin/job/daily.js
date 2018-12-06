@@ -40,11 +40,8 @@ export default class Daily {
         .getContestUrlList()
         .filter(c => c.startTime.startsWith(lastDay))
 
-    const contestBodyList =
-      await Promise.all(contestList.map(c => Req.get(c.url)))
-    
     const contestSummaryList =
-      contestBodyList
+      (await Promise.all(contestList.map(c => Req.get(c.url))))
         .map(body => new Contest(body))
         .map(c => c.summary())
 

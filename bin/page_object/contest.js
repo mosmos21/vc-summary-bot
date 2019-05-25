@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 export default class Contest {
   constructor(body) {
@@ -24,9 +24,9 @@ export default class Contest {
           const point = $(ele2).text();
           return point !== '-' && 0 < Number(point);
         })
-        .length - 1
+        .length - 1;
       res[userId] = Math.max(count, 0)
-    })
+    });
     return res;
   }
 }

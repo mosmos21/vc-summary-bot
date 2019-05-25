@@ -21,5 +21,5 @@ export default class CronJob {
         timeZone: job['TimeZone'] || 'Asia/Tokyo',
       });
     });
-  };
-};
+  }
+}

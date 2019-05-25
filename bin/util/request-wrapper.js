@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 import cheerio from 'cheerio'
 import request from 'request-promise'
@@ -14,7 +14,7 @@ export default class RequestWrapper {
     const options = {
       uri: consts.HOST + path,
       transform: body => cheerio.load(body)
-    }
+    };
     return request(options);
   }
 }

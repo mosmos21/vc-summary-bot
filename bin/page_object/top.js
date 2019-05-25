@@ -6,8 +6,8 @@ export default class Top {
   }
 
   getContestUrlList() {
-    const $ = this.body
-    let res = []
+    const $ = this.body;
+    let res = [];
     $('.table > tbody > tr').each((idx, ele) => {
       res.push({
         title: $(ele).find('td:nth-child(1)').text().trim(),

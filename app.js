@@ -1,5 +1,9 @@
+'use strict';
+require('dotenv').config();
 import express from 'express';
+import Logger from './bin/util/logger'
 import * as consts from './bin/consts';
+
 
 const app = express();
 
@@ -20,6 +24,6 @@ app.get('/', (request, response) => {
 });
 
 app.listen(app.get('port'), () => {
-  console.log("Node app is running at localhost:" + app.get('port'))
+  Logger.info("Node app is running at localhost:" + app.get('port'))
 });
 module.exports = app;

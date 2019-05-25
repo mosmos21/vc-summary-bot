@@ -1,0 +1,18 @@
+{
+  "appenders": {
+    "out": {
+      "type": "console"
+    },
+    "default": {
+      "type": "file",
+      "filename": "logs/console.log"
+    }
+  },
+  "categories": {
+    "default": {
+      "appenders": ["out","default"],
+      "level": "info"
+    }
+  },
+  "replaceConsole": true
+}

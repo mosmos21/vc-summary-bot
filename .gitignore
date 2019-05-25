@@ -1,4 +1,7 @@
 .idea/
 node_modules/
+logs/
+
+.env
 
 local_run.*

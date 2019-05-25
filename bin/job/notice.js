@@ -13,7 +13,7 @@ const message = con =>
 コンテスト名：${con.title}
 開始時間：${con.startTime}
 終了時間：${con.endTime}
-ペナルティ：${con.penalty}
+ペナルティ：${con.penalty}分
 
 ${consts.HOST}${con.url}`
 

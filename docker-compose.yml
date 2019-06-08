@@ -1,0 +1,9 @@
+version: "3"
+services:
+  web:
+    build: .
+    command: "yarn run start:dev"
+    volumes:
+      - .:/bot
+    ports:
+      - 3000:3000

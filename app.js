@@ -2,8 +2,8 @@
 require('dotenv').config();
 const line = require('@line/bot-sdk');
 import express from 'express';
-import Logger from './bin/util/logger'
-import * as consts from './bin/consts';
+import Logger from './app/util/logger'
+import * as consts from './app/consts';
 
 const app = express();
 

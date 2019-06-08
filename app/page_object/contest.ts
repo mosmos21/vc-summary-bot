@@ -1,11 +1,13 @@
-'use strict';
+import {ContestSummary} from "./types";
 
 export default class Contest {
-  constructor(body) {
+  body: CheerioStatic;
+
+  constructor(body: CheerioStatic) {
     this.body = body;
   }
 
-  penalty() {
+  penalty(): number {
     const header = this.body('h1 > small').text().trim();
     const penalty = header.substring(header.indexOf('ペナルティ') + 5).split('/')[0];
     return penalty !== undefined || penalty !== ''
@@ -13,9 +15,9 @@ export default class Contest {
       : 0;
   }
 
-  summary() {
+  summary(): ContestSummary {
     const $ = this.body;
-    let res = {};
+    let res: ContestSummary = {};
     $('.table > tbody > tr').each((idx, ele) => {
       const userId = $(ele).find('th:nth-child(2)').text().trim();
       const count = $(ele)

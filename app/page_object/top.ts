@@ -1,13 +1,15 @@
-'use strict'
+import { ContestInfo } from './types';
 
 export default class Top {
-  constructor(body) {
+  body: CheerioStatic;
+
+  constructor(body: CheerioStatic) {
     this.body = body
   }
 
-  getContestUrlList() {
+  getContestUrlList(): ContestInfo[] {
     const $ = this.body;
-    let res = [];
+    let res: ContestInfo[] = [];
     $('.table > tbody > tr').each((idx, ele) => {
       res.push({
         title: $(ele).find('td:nth-child(1)').text().trim(),

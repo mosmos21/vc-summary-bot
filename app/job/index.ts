@@ -1,8 +1,7 @@
-'use strict';
+import Daily from './daily'
+import Notice from './notice'
+import CronJob from '../util/cron_job'
 
-import Daily from './job/daily'
-import Notice from './job/notice'
-import CronJob from './util/cron_job'
 const jobs = new CronJob();
 
 jobs.addAll([
@@ -14,4 +13,5 @@ jobs.addAll([
     jobClass: new Notice(),
   }
 ]);
-jobs.applyAll();
+(async () => await new Notice().run())();
+export default jobs;
